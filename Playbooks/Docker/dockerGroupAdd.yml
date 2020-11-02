@@ -1,0 +1,21 @@
+# Add only system users to a docker group
+---
+- hosts: "{{ computer_name }}"
+  become: yes
+
+  tasks:
+    
+    - shell: grep -E 1[0-9]{3}  /etc/passwd | sed s/:/\ / | awk '{print $1}' # filtering non-system users from 'passwd' file
+      register: user
+   
+    - debug:
+        msg: "{{ item }}"
+      with_items:
+        - "{{ user.stdout_lines }}"
+
+    - name: Add user to docker group 
+      user:
+        name: '{{ item }}' 
+        group: docker
+        state: present
+      with_items: "{{ user.stdout_lines }}"

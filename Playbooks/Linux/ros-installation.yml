@@ -1,0 +1,30 @@
+---
+- hosts: "{{ computer_name }}"
+  
+  tasks:
+  - name: Setup ROS in Sources List
+    shell: sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    
+  - name: Add apt-keys for ROS    
+    apt_key:
+      keyserver: keyserver.ubuntu.com
+      id: '{{ key }}'
+      state: present 
+  
+  - name: Run apt update command
+    apt:
+      update_cache: yes
+
+  - name: Install ROS Kinetic For Ubuntu 16.04 
+    apt: 
+      name: ros-kinetic-desktop-full
+      state: present
+      update_cache: yes
+    when: ansible_facts['distribution_major_version'] == "16"
+
+  - name: Install ROS Melodic For Ubuntu 18.04 
+    apt: 
+      name: ros-melodic-desktop-full
+      state: present
+      update_cache: yes
+    when: ansible_facts['distribution_major_version'] == "18"

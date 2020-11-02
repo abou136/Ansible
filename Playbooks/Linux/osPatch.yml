@@ -1,0 +1,19 @@
+#simple playbook that will install package updates on munitple distrobutions of linux 
+- hosts: all
+  become: yes  
+  become_method: enable
+  become_user: '{{ user }}' 
+
+  tasks:
+  - name: yum Security Updates  
+    yum:
+      name: '*'
+      security: yes
+      state: latest    
+    when: ansible_os_family == "RedHat"  # this will cover RedHat, CentOS, Fedora 
+  
+  - name: Apt security updates
+    apt:
+      name: "*"
+      state: latest
+    when: ansible_os_family == "Debian" # this will cover Debian and Ubuntu 
